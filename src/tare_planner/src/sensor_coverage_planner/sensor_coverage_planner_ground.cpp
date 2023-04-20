@@ -26,28 +26,28 @@ bool PlannerParameters::ReadParameters(ros::NodeHandle& nh)
 
   // 获取sub_start_exploration_topic_的值，默认是 /exploration_start
   sub_start_exploration_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_start_exploration_topic_", "/exploration_start");
+      misc_utils_ns::getParam<std::string>(nh, "sub_start_exploration_topic_", "exploration_start");
   // 获取sub_state_estimation_topic_的值，默认是 /state_estimation_at_scan
   sub_state_estimation_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_state_estimation_topic_", "/state_estimation_at_scan");
+      misc_utils_ns::getParam<std::string>(nh, "sub_state_estimation_topic_", "state_estimation_at_scan");
   // 获取sub_registered_scan_topic_的值，默认是 /registered_scan
   sub_registered_scan_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_registered_scan_topic_", "/registered_scan");
+      misc_utils_ns::getParam<std::string>(nh, "sub_registered_scan_topic_", "registered_scan");
   // 获取sub_terrain_map_topic_的值，默认是 /terrain_map
-  sub_terrain_map_topic_ = misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_topic_", "/terrain_map");
+  sub_terrain_map_topic_ = misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_topic_", "terrain_map");
   sub_terrain_map_ext_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_ext_topic_", "/terrain_map_ext");
+      misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_ext_topic_", "terrain_map_ext");
   sub_coverage_boundary_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_coverage_boundary_topic_", "/coverage_boundary");
+      misc_utils_ns::getParam<std::string>(nh, "sub_coverage_boundary_topic_", "coverage_boundary");
   sub_viewpoint_boundary_topic_ =
-      misc_utils_ns::getParam<std::string>(nh, "sub_viewpoint_boundary_topic_", "/navigation_boundary");
-  sub_nogo_boundary_topic_ = misc_utils_ns::getParam<std::string>(nh, "sub_nogo_boundary_topic_", "/nogo_boundary");
+      misc_utils_ns::getParam<std::string>(nh, "sub_viewpoint_boundary_topic_", "navigation_boundary");
+  sub_nogo_boundary_topic_ = misc_utils_ns::getParam<std::string>(nh, "sub_nogo_boundary_topic_", "nogo_boundary");
   pub_exploration_finish_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "pub_exploration_finish_topic_", "exploration_finish");
   pub_runtime_breakdown_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "pub_runtime_breakdown_topic_", "runtime_breakdown");
-  pub_runtime_topic_ = misc_utils_ns::getParam<std::string>(nh, "pub_runtime_topic_", "/runtime");
-  pub_waypoint_topic_ = misc_utils_ns::getParam<std::string>(nh, "pub_waypoint_topic_", "/way_point");
+  pub_runtime_topic_ = misc_utils_ns::getParam<std::string>(nh, "pub_runtime_topic_", "runtime");
+  pub_waypoint_topic_ = misc_utils_ns::getParam<std::string>(nh, "pub_waypoint_topic_", "way_point");
   pub_momentum_activation_count_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "pub_momentum_activation_count_topic_", "momentum_activation_count");
 
