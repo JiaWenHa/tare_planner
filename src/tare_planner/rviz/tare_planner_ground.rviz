@@ -49,7 +49,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: Intensity
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 20
@@ -66,15 +66,15 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
         - Class: rviz/Marker
-          Enabled: true
+          Enabled: false
           Marker Topic: /robot1/sensor_coverage_planner/keypose_graph_edge_marker
           Name: KeyposeGraphEdge
           Namespaces:
-            "": true
+            {}
           Queue Size: 100
-          Value: true
+          Value: false
         - Class: rviz/Marker
           Enabled: true
           Marker Topic: /robot1/sensor_coverage_planner/tare_visualizer/exploring_subspaces
@@ -486,7 +486,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 132.08489990234375
+      Distance: 151.87747192382812
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -502,9 +502,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0.30979564785957336
       Target Frame: map
-      Yaw: 3.1953952312469482
+      Yaw: 0.0853930339217186
     Saved: ~
 Window Geometry:
   Displays:
@@ -522,5 +522,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1859
-  X: 0
+  X: 72
   Y: 27

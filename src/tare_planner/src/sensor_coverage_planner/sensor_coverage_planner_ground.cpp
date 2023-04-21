@@ -117,6 +117,7 @@ void PlannerData::Initialize(ros::NodeHandle& nh, ros::NodeHandle& nh_p)
   reordered_global_subspace_cloud_ = std::make_unique<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>>(
       nh, "reordered_global_subspace_cloud", kWorldFrameID);
 
+  //指针初始化，这些指针在结构体PlannerData中定义了，但是还没有初始化
   planning_env_ = std::make_unique<planning_env_ns::PlanningEnv>(nh, nh_p);
   viewpoint_manager_ = std::make_shared<viewpoint_manager_ns::ViewPointManager>(nh_p);
   local_coverage_planner_ = std::make_unique<local_coverage_planner_ns::LocalCoveragePlanner>(nh_p);
@@ -248,6 +249,8 @@ bool SensorCoveragePlanner3D::initialize(ros::NodeHandle& nh, ros::NodeHandle& n
 
 /**
  * 函数功能：接受到sub_start_exploration_topic_话题后,如果话题的值为true,将start_exploration_标志置为true
+ * 输入：要订阅的话题的消息类型的指针
+ * 输出：设置类中的全局变量 start_exploration_ 的值
 */
 void SensorCoveragePlanner3D::ExplorationStartCallback(const std_msgs::Bool::ConstPtr& start_msg)
 {
