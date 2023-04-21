@@ -24,16 +24,16 @@ bool PlannerParameters::ReadParameters(ros::NodeHandle& nh)
    * exploration_finish, runtime_breakdown, /runtime, /way_point, momentum_activation_count
   */
 
-  // 获取sub_start_exploration_topic_的值，默认是 /exploration_start
+  // 获取sub_start_exploration_topic_的值，默认是 exploration_start
   sub_start_exploration_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "sub_start_exploration_topic_", "exploration_start");
-  // 获取sub_state_estimation_topic_的值，默认是 /state_estimation_at_scan
+  // 获取sub_state_estimation_topic_的值，默认是 state_estimation_at_scan
   sub_state_estimation_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "sub_state_estimation_topic_", "state_estimation_at_scan");
-  // 获取sub_registered_scan_topic_的值，默认是 /registered_scan
+  // 获取sub_registered_scan_topic_的值，默认是 registered_scan
   sub_registered_scan_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "sub_registered_scan_topic_", "registered_scan");
-  // 获取sub_terrain_map_topic_的值，默认是 /terrain_map
+  // 获取sub_terrain_map_topic_的值，默认是 terrain_map
   sub_terrain_map_topic_ = misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_topic_", "terrain_map");
   sub_terrain_map_ext_topic_ =
       misc_utils_ns::getParam<std::string>(nh, "sub_terrain_map_ext_topic_", "terrain_map_ext");
@@ -79,6 +79,7 @@ bool PlannerParameters::ReadParameters(ros::NodeHandle& nh)
 
 void PlannerData::Initialize(ros::NodeHandle& nh, ros::NodeHandle& nh_p)
 {
+  // 初始化一系列的点云，点云的根坐标系是 kWorldFrameID
   // 创建一个对象，对象的名称是 keypose_cloud，对象的坐标系是 kWorldFrameID ,默认是map
   keypose_cloud_ =
       std::make_unique<pointcloud_utils_ns::PCLCloud<PlannerCloudPointType>>(nh, "keypose_cloud", kWorldFrameID);
@@ -138,17 +139,17 @@ void PlannerData::Initialize(ros::NodeHandle& nh, ros::NodeHandle& nh_p)
   keypose_graph_edge_marker_ = std::make_unique<misc_utils_ns::Marker>(nh, "keypose_graph_edge_marker", kWorldFrameID);
   keypose_graph_edge_marker_->SetType(visualization_msgs::Marker::LINE_LIST);
   keypose_graph_edge_marker_->SetScale(0.05, 0.0, 0.0);
-  keypose_graph_edge_marker_->SetColorRGBA(1.0, 1.0, 0.0, 0.9);
+  keypose_graph_edge_marker_->SetColorRGBA(1.0, 1.0, 0.0, 0.9); //黄色
 
   nogo_boundary_marker_ = std::make_unique<misc_utils_ns::Marker>(nh, "nogo_boundary_marker", kWorldFrameID);
   nogo_boundary_marker_->SetType(visualization_msgs::Marker::LINE_LIST);
   nogo_boundary_marker_->SetScale(0.05, 0.0, 0.0);
-  nogo_boundary_marker_->SetColorRGBA(1.0, 0.0, 0.0, 0.8);
+  nogo_boundary_marker_->SetColorRGBA(1.0, 0.0, 0.0, 0.8);//红色
 
   grid_world_marker_ = std::make_unique<misc_utils_ns::Marker>(nh, "grid_world_marker", kWorldFrameID);
   grid_world_marker_->SetType(visualization_msgs::Marker::CUBE_LIST);
   grid_world_marker_->SetScale(1.0, 1.0, 1.0);
-  grid_world_marker_->SetColorRGBA(1.0, 0.0, 0.0, 0.8);
+  grid_world_marker_->SetColorRGBA(1.0, 0.0, 0.0, 0.8); //红色
 
   robot_yaw_ = 0.0;
   lookahead_point_direction_ = Eigen::Vector3d(1.0, 0.0, 0.0);

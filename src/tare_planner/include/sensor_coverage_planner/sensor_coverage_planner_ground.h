@@ -180,7 +180,7 @@ private:
   bool step_;
   bool use_momentum_;
   bool lookahead_point_in_line_of_sight_;
-  PlannerParameters pp_;
+  PlannerParameters pp_; //规划器参数
   PlannerData pd_;
   pointcloud_utils_ns::PointCloudDownsizer<pcl::PointXYZ> pointcloud_downsizer_; //降采样点云类实体
 

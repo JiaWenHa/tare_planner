@@ -88,3 +88,9 @@ TARE Planner was used by the [CMU-OSU Team](https://www.subt-explorer.com) in at
 ## Credit
 
 [OR-Tools](https://developers.google.com/optimization) is from Google
+
+
+## 运行带命名空间的tare算法
+```shell
+roslaunch tare_planner multirobot_explore_garage.launch
+```

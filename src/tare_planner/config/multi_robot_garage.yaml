@@ -1,4 +1,5 @@
-# Sensor Coverage Planner Ground
+# Sensor Coverage Planner Ground 中获取的参数
+# 订阅的话题的话题名
 sub_start_exploration_topic_ : start_exploration
 sub_terrain_map_topic_ : /robot1/terrain_map
 sub_terrain_map_ext_topic_ : /robot1/terrain_map_ext
@@ -7,6 +8,7 @@ sub_registered_scan_topic_ : /robot1/registered_scan
 sub_coverage_boundary_topic_ : sensor_coverage_planner/coverage_boundary
 sub_viewpoint_boundary_topic_ : /robot1/navigation_boundary
 sub_nogo_boundary_topic_ : sensor_coverage_planner/nogo_boundary
+# 发布的话题的话题名
 pub_exploration_finish_topic_ : exploration_finish
 pub_runtime_breakdown_topic_ : runtime_breakdown
 pub_runtime_topic_ : runtime
