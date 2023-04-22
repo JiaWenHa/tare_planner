@@ -88,3 +88,10 @@ TARE Planner was used by the [CMU-OSU Team](https://www.subt-explorer.com) in at
 ## Credit
 
 [OR-Tools](https://developers.google.com/optimization) is from Google
+
+
+## 在原版本上做的修改
+1. 新建多机器人仿真的launch文件，方便后续仿真时开启多个tare程序，使用如下命令启动:
+```shell
+roslaunch tare_planner explore_garage_multi_robot.launch
+```
