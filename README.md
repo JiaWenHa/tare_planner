@@ -91,7 +91,12 @@ TARE Planner was used by the [CMU-OSU Team](https://www.subt-explorer.com) in at
 
 
 ## 在原版本上做的修改
+想法：
+1. 用强化学习替换视点选取模块
+
+已修改部分：
 1. 新建多机器人仿真的launch文件，方便后续仿真时开启多个tare程序，使用如下命令启动:
 ```shell
 roslaunch tare_planner explore_garage_multi_robot.launch
 ```
+仿真中，针对仿真时对不同机器人运行同一个程序的方法：复制整个工程，更改命名空间并修改其中的"map","sensor","vehicle"使其适配新建的机器人模型，然后重新编译工程，打开新的终端运行程序。

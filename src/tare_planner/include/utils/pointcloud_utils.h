@@ -54,6 +54,14 @@ public:
   {
     kNeighborThreshold = neighbor_threshold;
   }
+
+  /**
+   * 函数功能：ExtractVerticalSurface这个函数是希望把墙上的点都提取出来，把地上和天花板上的点扔掉。
+   * 主要的想法是看每个点邻域内其他点的分布。如果一个点的邻域内其他点都和它有一定的高度差，那这个点很有可能就是墙上的点（vertical surface）。 
+   * 具体实现上用了一个操作点云的小技巧。先把点云的高度（z）存在PointXYZI的intensity里面，然后把z设成0，就得到了一个在xy平面上的扁平化的点云。
+   * 然后对每一个点用kdtree搜索邻域，如果邻域内点的intensity，也就是z，存在一定高度差，那么它就是墙上的点。
+   * 值得注意的是，如果这个高度差太大，那它可能是天花板或者地上的点。因为把点云在xy平面上压扁后天花板上的点和地上的点混合在了一起。
+  */
   template <class PCLPointType>
   void ExtractVerticalSurface(typename pcl::PointCloud<PCLPointType>::Ptr& cloud, double z_max = DBL_MAX,
                               double z_min = -DBL_MAX)

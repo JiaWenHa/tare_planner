@@ -1,15 +1,14 @@
 <launch>
+<group ns="robot1">
     <arg name="rosbag_record" default="false"/>
     <arg name="bag_path" default="Desktop"/>
     <arg name="bag_name_prefix" default="tare_garage"/>
-    <arg name="rviz" default="true"/>
     <arg name="use_boundary" default="false"/>
     <include file="$(find tare_planner)/launch/multi_robot/explore_multi_robot.launch">
         <arg name="scenario" value="garage_multi_robot"/>
         <arg name="rosbag_record" value="$(arg rosbag_record)"/>
         <arg name="bag_path" value="$(arg bag_path)"/>
         <arg name="bag_name_prefix" value="$(arg bag_name_prefix)"/>
-        <arg name="rviz" value="$(arg rviz)"/>
     </include>
 
     <group if="$(arg use_boundary)">
@@ -18,5 +17,11 @@
             <param name="sendBoundary" type="bool" value="true" />
             <param name="sendBoundaryInterval" type="int" value="2" />
         </node>
+    </group>
+</group>
+
+    <arg name="rviz" default="true"/>
+    <group if="$(arg rviz)">
+        <node launch-prefix="nice" pkg="rviz" type="rviz" name="tare_planner_ground_rviz" args="-d $(find tare_planner)/rviz/multi_robot/tare_planner_ground.rviz" respawn="true"/>
     </group>
 </launch>

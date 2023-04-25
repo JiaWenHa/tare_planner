@@ -212,6 +212,7 @@ public:
   }
   int GetCollisionFrameCount() const
   {
+    //collision_frame_count_指一个viewpoint在连续多少帧内存在碰撞
     return collision_frame_count_;
   }
   void AddCollisionFrame()
@@ -229,6 +230,8 @@ private:
   // Whether this viewpoint is in collision with the environment
   bool in_collision_;
   // Whether this viewpoint has been in the line of sight of the robot
+  // in_line_of_sight_指一个viewpoint是否曾经被看（ray trace）到过。
+  // 大概的思想是如果一个viewpoint在几帧之前被认为有collision但却能在当前帧被ray trace到，这个viewpoint就不被认为是有collision。
   bool in_line_of_sight_;
   // Whether this viewpoint and the robot’s current location are within the same connected component. It must be true to
   // have a collision-free path planned from the current robot position to this viewpoint.
@@ -252,6 +255,7 @@ private:
   double terrain_height_;
   bool has_terrain_neighbor_;
   // Whether the viewpoint is in line of sight in the current frame
+  // in_current_frame_line_of_sight_指一个viewpoint是否能在当前帧被看（ray trace）到。
   bool in_current_frame_line_of_sight_;
   // Indices of the covered points
   std::vector<int> covered_point_list_;

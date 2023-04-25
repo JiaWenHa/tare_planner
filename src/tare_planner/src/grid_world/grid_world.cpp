@@ -620,6 +620,10 @@ void GridWorld::UpdateCellStatus(const std::shared_ptr<viewpoint_manager_ns::Vie
         above_frontier_threshold_count++;
       }
     }
+
+    // Cell status的转换条件大概是如果能sample到至少一个viewpoint，这个cell就是exploring。
+    // 如果cell里面有viewpoint且它们都看不到足够的surface，这个cell就是会被加入almost covered的列队。
+    
     // Exploring to Covered
     if (subspaces_->GetCell(cell_ind).GetStatus() == CellStatus::EXPLORING &&
         above_frontier_threshold_count < kCellExploringToCoveredThr &&

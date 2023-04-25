@@ -1,13 +1,10 @@
 <launch>
     <arg name="scenario" default="garage_multi_robot"/>
-    <arg name="rviz" default="true"/>
     <arg name="rosbag_record" default="false"/>
     <arg name="bag_path" default="Desktop"/>
     <arg name="bag_name_prefix" default="tare"/>
 
-    <group if="$(arg rviz)">
-        <node launch-prefix="nice" pkg="rviz" type="rviz" name="tare_planner_ground_rviz" args="-d $(find tare_planner)/rviz/multi_robot/tare_planner_ground.rviz" respawn="true"/>
-    </group>
+
     
     <group if="$(arg rosbag_record)">
         <include file="$(find tare_planner)/launch/record_bag.launch">
