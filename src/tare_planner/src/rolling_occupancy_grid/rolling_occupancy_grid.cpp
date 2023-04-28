@@ -289,6 +289,17 @@ void RollingOccupancyGrid::RayTraceHelper(const Eigen::Vector3i& start_sub, cons
   }
 }
 
+/**
+ * 函数功能：
+ * 此函数查找占用网格中相对于给定原点和范围的边界点。
+ * 边界点定义为在 xy 平面中具有相邻空闲单元但在 z 方向上没有相邻空闲单元的未知单元。-- 为了过滤掉天花板和地面上的frontier点。
+ * 该函数首先清除输入的“frontier_cloud”指针，该指针被假定为指向“pcl::PointCloud<pcl::PointXYZI>”对象的指针。 
+ * 然后它将原点和范围输入转换为占用数组中的相应下标。 如果原点超出范围，则函数不执行任何操作返回。
+ * 然后该函数遍历占用数组中的所有单元格，跳过那些超出范围或不在指定范围内的单元格。 
+ * 对于每个未知单元格，它检查它是否在 xy 平面上有相邻的空闲单元格，但在 z 方向上没有。 
+ * 如果是，它将单元格的下标转换为一个位置并将其添加到“frontier_cloud”。
+ * 请注意，该函数假定占用网格已经初始化，并且已经设置了 occupancy_array_ 和 rolling_grid_ 指针。
+*/
 void RollingOccupancyGrid::GetFrontier(pcl::PointCloud<pcl::PointXYZI>::Ptr& frontier_cloud,
                                        const Eigen::Vector3d& origin, const Eigen::Vector3d& range)
 {
@@ -297,7 +308,8 @@ void RollingOccupancyGrid::GetFrontier(pcl::PointCloud<pcl::PointXYZI>::Ptr& fro
     return;
   }
   frontier_cloud->points.clear();
-  Eigen::Vector3i sub_max = occupancy_array_->Pos2Sub(origin + range);
+  
+  Eigen::Vector3i sub_max = occupancy_array_->Pos2Sub(origin + range);//根据体素网格的位置返回体素网格的位置编号
   Eigen::Vector3i sub_min = occupancy_array_->Pos2Sub(origin - range);
   Eigen::Vector3i origin_sub = occupancy_array_->Pos2Sub(origin);
 

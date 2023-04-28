@@ -198,7 +198,7 @@ private:
   }
 
   /**
-   * @brief Get the Horizontal Angle object
+   * @brief 得到机器人位置和给定点之间的水平角度
    * TODO
    * @param dx
    * @param dy
@@ -210,7 +210,7 @@ private:
     return static_cast<int>(round(horizontal_angle));
   }
   /**
-   * @brief Get the Vertical Angle object
+   * @brief 得到机器人位置和给定点之间的垂直距离
    * TODO
    * @param dz
    * @param distance_to_point
@@ -257,29 +257,29 @@ private:
   static const double kToDegreeConst;
   // Constant converting degree to radian
   static const double kToRadianConst;
-  // Threshold for checking if a number is close to zero
+  // 检查数字是否接近于零的阈值
   static const double kEpsilon;
-  // Ratio for inflating the cloud
+  // 膨胀点云的比率
   static const double kCloudInflateRatio;
-  // Horizontal field-of-view in degrees
+  // 以度为单位的水平视野
   static const int kHorizontalFOV = 360;
-  // Vertical field-of-view in degrees
+  // 以度为单位的垂直视野
   static const int kVerticalFOV = 24;
-  // Horizontal resolution
+  // 水平分辨率
   static const int kHorizontalResolution = 2;
-  // Vertical resolution
+  // 垂直分辨率
   static const int kVerticalResolution = 2;
-  // Horizontal dimension of the voxel grid
+  // 体素网格的水平维度
   static const int kHorizontalVoxelSize = kHorizontalFOV / kHorizontalResolution;
-  // Vertical dimension of the voxel grid
+  // 体素网格的垂直维度
   static const int kVerticalVoxelSize = kVerticalFOV / kVerticalResolution;
-  // Vertical angle offset, eg, angle [75, 105] -> indices [0, 30]
+  // 垂直角度偏移，例如，角度 [75, 105] -> 索引 [0, 30]
   static const int kVerticalAngleOffset = -(90 - kVerticalFOV / 2);
-  // The distance that a ray can reach from the direction determined by the horizontal angle and vertical angle
+  // 射线从由水平角和垂直角确定的方向所能到达的距离
   std::array<float, kHorizontalVoxelSize * kVerticalVoxelSize> covered_voxel_;
-  // Whether a voxel is reset
+  // 体素是否重置
   std::array<bool, kHorizontalVoxelSize * kVerticalVoxelSize> reset_;
-  // Pose of the lidar model
+  // 激光雷达模型的姿态
   geometry_msgs::Pose pose_;
 };
 }  // namespace lidar_model_ns

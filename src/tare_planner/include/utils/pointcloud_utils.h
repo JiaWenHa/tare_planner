@@ -56,7 +56,8 @@ public:
   }
 
   /**
-   * 函数功能：ExtractVerticalSurface这个函数是希望把墙上的点都提取出来，把地上和天花板上的点扔掉。
+   * 函数功能：
+   * ExtractVerticalSurface这个函数是希望把墙上的点都提取出来，把地上和天花板上的点扔掉。
    * 主要的想法是看每个点邻域内其他点的分布。如果一个点的邻域内其他点都和它有一定的高度差，那这个点很有可能就是墙上的点（vertical surface）。 
    * 具体实现上用了一个操作点云的小技巧。先把点云的高度（z）存在PointXYZI的intensity里面，然后把z设成0，就得到了一个在xy平面上的扁平化的点云。
    * 然后对每一个点用kdtree搜索邻域，如果邻域内点的intensity，也就是z，存在一定高度差，那么它就是墙上的点。
@@ -210,6 +211,7 @@ struct pointcloud_utils_ns::PCLCloud
     cloud_ = typename pcl::PointCloud<PCLPointType>::Ptr(new pcl::PointCloud<PCLPointType>);
     cloud_pub_ = nh->advertise<sensor_msgs::PointCloud2>(pub_cloud_topic_, 2);
   }
+  //下面这个构造函数比较常用
   PCLCloud(ros::NodeHandle& nh, std::string pub_cloud_topic, std::string frame_id)
     : pub_cloud_topic_(pub_cloud_topic), frame_id_(frame_id)
   {

@@ -13,8 +13,8 @@
 
 namespace lidar_model_ns
 {
-const double LiDARModel::kToDegreeConst = 57.2957;
-const double LiDARModel::kToRadianConst = 0.01745;
+const double LiDARModel::kToDegreeConst = 57.2957; //1弧度 = 57.2957°
+const double LiDARModel::kToRadianConst = 0.01745; //1° = 0.01745弧度
 const double LiDARModel::kEpsilon = 1e-4;
 const double LiDARModel::kCloudInflateRatio = 2;
 double LiDARModel::pointcloud_resolution_ = 0.2;

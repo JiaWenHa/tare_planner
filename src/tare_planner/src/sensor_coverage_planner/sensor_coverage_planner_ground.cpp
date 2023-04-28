@@ -103,6 +103,7 @@ void PlannerData::Initialize(ros::NodeHandle& nh, ros::NodeHandle& nh_p)
       nh, "selected_viewpoint_vis_cloud", kWorldFrameID);
   exploring_cell_vis_cloud_ =
       std::make_unique<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>>(nh, "exploring_cell_vis_cloud", kWorldFrameID);
+  //与机器人有碰撞的点云
   collision_cloud_ =
       std::make_unique<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>>(nh, "collision_cloud", kWorldFrameID);
   lookahead_point_cloud_ =
@@ -206,6 +207,11 @@ bool SensorCoveragePlanner3D::initialize(ros::NodeHandle& nh, ros::NodeHandle& n
 
   lidar_model_ns::LiDARModel::setCloudDWZResol(pd_.planning_env_->GetPlannerCloudResolution());
 
+  /**
+   * 这行代码使用ROS的`nh`（节点句柄）对象创建了一个定时器，持续时间为1.0秒，触发了`SensorCoveragePlanner3D`类的`execute`函数，
+   * `this`指针作为回调函数。该定时器用于周期性触发`execute`函数，该函数主要负责规划机器人的轨迹，
+   * 并向机器人的运动控制器发送相应的指令。 计时器确保定期调用“execute”函数，这有助于保持一致的执行速度并确保机器人的行为是可预测的。
+  */
   execution_timer_ = nh.createTimer(ros::Duration(1.0), &SensorCoveragePlanner3D::execute, this);
 
   /*TODO: 以下带回调函数的订阅肯定很重要*/
@@ -256,6 +262,13 @@ void SensorCoveragePlanner3D::ExplorationStartCallback(const std_msgs::Bool::Con
   }
 }
 
+/**
+ * 函数功能：
+ * 这是一个机器人状态估计的回调函数。 该函数从消息中提取机器人的位置和方向并计算偏航角。 
+ * 它还根据机器人的线速度设置一个标志 `moving_forward_` 以指示机器人是向前还是向后移动。 
+ * 此外，如果之前没有设置过，它会用机器人的位置初始化 `pd_.initial_position_`。
+ * `pd_` 保存一些与规划器内部状态相关的数据。
+*/
 void SensorCoveragePlanner3D::StateEstimationCallback(const nav_msgs::Odometry::ConstPtr& state_estimation_msg)
 {
   //获取机器人的姿态，如果没有初始位姿则初始化初始位姿
@@ -288,6 +301,15 @@ void SensorCoveragePlanner3D::StateEstimationCallback(const nav_msgs::Odometry::
   initialized_ = true;
 }
 
+/**
+ * 函数功能: 
+ * 当在主题“/registered_scan”上收到新消息时调用。 它首先检查规划器是否已经初始化，如果没有，它什么都不做就返回。 
+ * 如果规划器已初始化，它将包含点云的 ROS 消息转换为 PCL 点云并对其进行下采样。
+ * 接下来，它更新机器人在规划环境中的位置并更新注册的点云。 
+ * 它跟踪此回调函数被调用的次数，并且每调用 5 次才更新关键位姿（机器人访问过的位置）和关键点云。 
+ * 它对注册扫描堆栈（注册点云的集合）进行下采样，并将其复制到关键点云。
+ * 最后，它设置一个标志，指示关键位姿和关键点云已更新。 关键点云稍后将用于计算传感器覆盖范围。
+*/
 void SensorCoveragePlanner3D::RegisteredScanCallback(const sensor_msgs::PointCloud2ConstPtr& registered_scan_msg)
 {
   // 初始化完成后才获取 /registered_scan
@@ -337,6 +359,14 @@ void SensorCoveragePlanner3D::RegisteredScanCallback(const sensor_msgs::PointClo
   }
 }
 
+/**
+ * 函数功能：
+ * 此函数是一个回调函数，每当收到新的地形图消息时都会执行该回调函数。 
+ * 地形图是一个 3D 点云，表示机器人局部参考系中的地形信息。 
+ * 该函数首先将 ROS 消息转换为 PCL 点云。 如果机器人配置为检查地形碰撞（在规划器的参数结构中指定），
+ * 则该函数将遍历点云中的每个点并检查其强度值是否大于指定阈值（也在规划器的参数中指定）。 
+ * 如果一个点的强度值超过阈值，则认为它是一个碰撞点并添加到规划器的地形碰撞点云中。
+*/
 void SensorCoveragePlanner3D::TerrainMapCallback(const sensor_msgs::PointCloud2ConstPtr& terrain_map_msg)
 {
   if (pp_.kCheckTerrainCollision)
@@ -357,6 +387,10 @@ void SensorCoveragePlanner3D::TerrainMapCallback(const sensor_msgs::PointCloud2C
   }
 }
 
+/***
+ * 函数功能：
+ * 判断terrain_map_ext点云中的点是否大于设定的地形碰撞阈值，如果大于则将其加入到terrain_ext_collision_cloud_点云中
+*/
 void SensorCoveragePlanner3D::TerrainMapExtCallback(const sensor_msgs::PointCloud2ConstPtr& terrain_map_ext_msg)
 {
   if (pp_.kUseTerrainHeight)
@@ -590,6 +624,7 @@ void SensorCoveragePlanner3D::UpdateGlobalRepresentation()
 
   pd_.planning_env_->UpdateRobotPosition(pd_.robot_position_);
   pd_.planning_env_->GetVisualizationPointCloud(pd_.point_cloud_manager_neighbor_cloud_->cloud_);
+  //发布点云名为 pointcloud_manager_cloud 的点云。这个点云用rviz看不到
   pd_.point_cloud_manager_neighbor_cloud_->Publish();
 
   // DEBUG
@@ -1271,6 +1306,29 @@ void SensorCoveragePlanner3D::CountDirectionChange()
   momentum_activation_count_pub_.publish(momentum_activation_count_msg);
 }
 
+/***
+ * 函数功能：
+ * 该函数首先检查规划器是否已初始化以及探索是否已开始。 如果不是，则等待启动信号。 
+ * 如果规划器未初始化，则发送初始航路点，记录开始时间，然后返回。
+ * 如果规划器已初始化，则启动 overall_processing_timer，并检查标志 keypose_cloud_update_。 
+ * 此标志指示代表环境的关键姿势云是否已更新。 如果设置了标志，则执行以下步骤：
+ * 计算方向变化的次数。
+ * 更新环境的全局表示。
+ * 更新探索的观点。
+ * 更新用于局部规划的关键姿态图。
+ * 更新视点的覆盖范围。
+ * 更新覆盖区域，即已经探索过的区域。
+ * 计算全局 TSP 顺序，它确定全局访问视点的顺序。
+ * 计算本地 TSP 顺序，它决定了在本地访问视点的顺序。
+ * 检查机器人是否离家很近，并相应地设置标志 near_home_ 和 at_home_。
+ * 检查探索是否完成，如果完成则设置标志 exploration_finished_。
+ * 连接全局路径和本地路径并将结果存储在 pd_.exploration_path_ 中。
+ * 更新路径上的先行点。
+ * 发布探索状态、航路点和运行时统计信息。
+ * 发布全局子空间、局部规划范围和运行时的可视化标记。
+ * 为本地和全局路径发布可视化标记。
+ * 最后，overall_processing_timer 停止，函数返回。
+*/
 void SensorCoveragePlanner3D::execute(const ros::TimerEvent&)
 {
   if (!pp_.kAutoStart && !start_exploration_)

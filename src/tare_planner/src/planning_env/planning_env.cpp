@@ -46,6 +46,7 @@ void PlanningEnvParameters::ReadParameters(ros::NodeHandle& nh)
   double local_planning_horizon_half_size = viewpoint_number * viewpoint_resolution / 2;
   double sensor_range = misc_utils_ns::getParam<double>(nh, "kSensorRange", 15);
 
+  //默认kExtractFrontierRange的x=20,y=20,z=2
   kExtractFrontierRange.x() = local_planning_horizon_half_size + sensor_range * 2;
   kExtractFrontierRange.y() = local_planning_horizon_half_size + sensor_range * 2;
   kExtractFrontierRange.z() = 2;
@@ -174,6 +175,7 @@ void PlanningEnv::UpdateFrontiers()
   if (parameters_.kUseFrontier)
   {
     prev_robot_position_ = robot_position_;
+    //得到的Frontier滤除了天花板和地面的点
     rolling_occupancy_grid_->GetFrontier(frontier_cloud_->cloud_, robot_position_, parameters_.kExtractFrontierRange);
 
     if (!frontier_cloud_->cloud_->points.empty())
@@ -182,6 +184,7 @@ void PlanningEnv::UpdateFrontiers()
       {
         GetCoverageCloudWithinBoundary<pcl::PointXYZI>(frontier_cloud_->cloud_);
       }
+      //获取Frontier中的垂直面
       vertical_frontier_extractor_.ExtractVerticalSurface<pcl::PointXYZI, pcl::PointXYZI>(
           frontier_cloud_->cloud_, filtered_frontier_cloud_->cloud_);
     }
@@ -189,11 +192,18 @@ void PlanningEnv::UpdateFrontiers()
     // Cluster frontiers
     if (!filtered_frontier_cloud_->cloud_->points.empty())
     {
+      /**
+       * 此代码使用 PCL 库在过滤后的边界云上执行欧几里德聚类。 
+       * 过滤后的Frontier点云首先被设置为 KD-Tree 数据结构的输入云。 
+       * 然后，创建 `pcl::EuclideanClusterExtraction` 类的一个实例，它设置集群容差、最小集群大小、最大集群大小、搜索方法（在本例中为 KD 树）和输入云。 
+       * 最后，在 ec 对象上调用 extract 函数来执行聚类，并将生成的聚类索引存储在 cluster_indices 向量中。
+      */
       kdtree_frontier_cloud_->setInputCloud(filtered_frontier_cloud_->cloud_);
-      std::vector<pcl::PointIndices> cluster_indices;
+      std::vector<pcl::PointIndices> cluster_indices; //聚类索引
       pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
-      ec.setClusterTolerance(parameters_.kFrontierClusterTolerance);
-      ec.setMinClusterSize(1);
+      // garage的kFrontierClusterTolerance的默认值是1.0
+      ec.setClusterTolerance(parameters_.kFrontierClusterTolerance);//设置近邻搜索的搜索半径
+      ec.setMinClusterSize(1);//设置最小聚类尺寸
       ec.setMaxClusterSize(10000);
       ec.setSearchMethod(kdtree_frontier_cloud_);
       ec.setInputCloud(filtered_frontier_cloud_->cloud_);
@@ -215,11 +225,12 @@ void PlanningEnv::UpdateFrontiers()
         }
         cluster_count++;
       }
-      pcl::ExtractIndices<pcl::PointXYZI> extract;
-      extract.setInputCloud(filtered_frontier_cloud_->cloud_);
-      extract.setIndices(inliers);
-      extract.setNegative(false);
-      extract.filter(*(filtered_frontier_cloud_->cloud_));
+      pcl::ExtractIndices<pcl::PointXYZI> extract; //创建点云提取对象
+      extract.setInputCloud(filtered_frontier_cloud_->cloud_); //设置输入点云
+      extract.setIndices(inliers); //设置分割后的内点为需要提取的点集
+      extract.setNegative(false); //设置提取内点而非外点
+      extract.filter(*(filtered_frontier_cloud_->cloud_));//提取输出存储到filtered_frontier_cloud_->cloud_
+      //发布话题名为rolling_filtered_frontier_cloud的点云消息。实际好像输出为空
       filtered_frontier_cloud_->Publish();
     }
   }

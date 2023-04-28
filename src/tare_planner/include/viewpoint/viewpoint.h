@@ -235,31 +235,42 @@ private:
   bool in_line_of_sight_;
   // Whether this viewpoint and the robot’s current location are within the same connected component. It must be true to
   // have a collision-free path planned from the current robot position to this viewpoint.
+  // 这个视点和机器人的当前位置是否在同一个连通分量内。 从当前机器人位置到该视点必须规划一条无碰撞路径。
   bool connected_;
   // Whether this viewpoint has been visited by the robot. If true, its coverage area will not be updated and it will
   // not be selected in the sampling process.
+  // 机器人是否访问过该视点。 如果为 true，则其覆盖区域将不会更新，并且不会在采样过程中被选中。
   bool visited_;
   // Whether this viewpoint is selected to form the path.
+  // 是否选择此视点来形成路径。
   bool selected_;
   // Whether this viewpoint is a candidate to be selected to form the path.
+  // 此视点是否是要选择以形成路径的候选者。
   bool is_candidate_;
   // Whether this viewpoint has a height set from terrain analysis
+  // 此视点是否具有地形分析的高度集
   bool has_terrain_height_;
   // Whether this viewpoint is in an EXPLORING cell
+  // 此视点是否在 EXPLORING 单元格中
   bool in_exploring_cell_;
   // The index of the cell this viewpoint is in.
+  // 此视点所在的单元格的索引。
   int cell_ind_;
   // The index of this viewpoint among all the candidate viewpoints.
+  // 该视点在所有候选视点中的索引。
   int collision_frame_count_;
   // For debug
   double terrain_height_;
   bool has_terrain_neighbor_;
   // Whether the viewpoint is in line of sight in the current frame
   // in_current_frame_line_of_sight_指一个viewpoint是否能在当前帧被看（ray trace）到。
+  // 视点是否在当前帧的视线内
   bool in_current_frame_line_of_sight_;
   // Indices of the covered points
+  // 覆盖点的索引
   std::vector<int> covered_point_list_;
   // Indices of the covered frontier points
+  // 覆盖边界点的索引
   std::vector<int> covered_frontier_point_list_;
 };
 }  // namespace viewpoint_ns
