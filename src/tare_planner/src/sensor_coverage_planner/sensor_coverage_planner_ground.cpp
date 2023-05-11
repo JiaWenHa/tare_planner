@@ -214,12 +214,17 @@ bool SensorCoveragePlanner3D::initialize(ros::NodeHandle& nh, ros::NodeHandle& n
   */
   execution_timer_ = nh.createTimer(ros::Duration(1.0), &SensorCoveragePlanner3D::execute, this);
 
-  /*TODO: 以下带回调函数的订阅肯定很重要*/
+  
   // subscribe(订阅的话题，消息队列的长度，回调函数，this(在类中定义时要用this))，调用成功时，返回一个订阅者对象，失败时，返回空对象
   exploration_start_sub_ =
       nh.subscribe(pp_.sub_start_exploration_topic_, 5, &SensorCoveragePlanner3D::ExplorationStartCallback, this);
+  /**
+   * TODO:接收 registered_scan 是为了干啥？
+  */
   registered_scan_sub_ =
       nh.subscribe(pp_.sub_registered_scan_topic_, 5, &SensorCoveragePlanner3D::RegisteredScanCallback, this);
+  /*接收terrian map之后从中提取出障碍物点云
+  */
   terrain_map_sub_ = nh.subscribe(pp_.sub_terrain_map_topic_, 5, &SensorCoveragePlanner3D::TerrainMapCallback, this);
   terrain_map_ext_sub_ =
       nh.subscribe(pp_.sub_terrain_map_ext_topic_, 5, &SensorCoveragePlanner3D::TerrainMapExtCallback, this);
@@ -268,6 +273,8 @@ void SensorCoveragePlanner3D::ExplorationStartCallback(const std_msgs::Bool::Con
  * 它还根据机器人的线速度设置一个标志 `moving_forward_` 以指示机器人是向前还是向后移动。 
  * 此外，如果之前没有设置过，它会用机器人的位置初始化 `pd_.initial_position_`。
  * `pd_` 保存一些与规划器内部状态相关的数据。
+ * 
+ * 这个函数主要是获取机器人的位姿
 */
 void SensorCoveragePlanner3D::StateEstimationCallback(const nav_msgs::Odometry::ConstPtr& state_estimation_msg)
 {
@@ -331,6 +338,7 @@ void SensorCoveragePlanner3D::RegisteredScanCallback(const sensor_msgs::PointClo
   pointcloud_downsizer_.Downsize(registered_scan_tmp, pp_.kKeyposeCloudDwzFilterLeafSize,
                                  pp_.kKeyposeCloudDwzFilterLeafSize, pp_.kKeyposeCloudDwzFilterLeafSize);
 
+  //将降采样后的配准后的点云
   pd_.registered_cloud_->cloud_->clear();
   //将一个点云对象的内容复制到另一个不同类型的点云对象
   pcl::copyPointCloud(*registered_scan_tmp, *(pd_.registered_cloud_->cloud_));
@@ -345,7 +353,7 @@ void SensorCoveragePlanner3D::RegisteredScanCallback(const sensor_msgs::PointClo
   {
     // initialized_ = true;
     pd_.keypose_.pose.pose.position = pd_.robot_position_;
-    pd_.keypose_.pose.covariance[0] = keypose_count_++;
+    pd_.keypose_.pose.covariance[0] = keypose_count_++; //关键位姿的数量
     pd_.cur_keypose_node_ind_ = pd_.keypose_graph_->AddKeyposeNode(pd_.keypose_, *(pd_.planning_env_));
 
     pointcloud_downsizer_.Downsize(pd_.registered_scan_stack_->cloud_, pp_.kKeyposeCloudDwzFilterLeafSize,
@@ -374,11 +382,14 @@ void SensorCoveragePlanner3D::TerrainMapCallback(const sensor_msgs::PointCloud2C
     //将ROS点云转为PCL点云
     pcl::PointCloud<pcl::PointXYZI>::Ptr terrain_map_tmp(new pcl::PointCloud<pcl::PointXYZI>());
     pcl::fromROSMsg<pcl::PointXYZI>(*terrain_map_msg, *terrain_map_tmp);
+    //清除点云对象的内容，包括其头部和点数据
     pd_.terrain_collision_cloud_->cloud_->clear();
+
     //for循环遍历terrain_map_tmp点云中的每个点
     for (auto& point : terrain_map_tmp->points)
     {
-      // 如果点的强度大于指定的阈值，将碰撞的点更新进地形碰撞点云
+      // 如果点的高度大于指定的阈值，将碰撞的点更新进地形碰撞点云
+      // 地形点云中的intensity存储的是点云的高高度
       if (point.intensity > pp_.kTerrainCollisionThreshold)
       {
         pd_.terrain_collision_cloud_->cloud_->points.push_back(point);
@@ -1336,9 +1347,10 @@ void SensorCoveragePlanner3D::execute(const ros::TimerEvent&)
     ROS_INFO("Waiting for start signal");
     return;
   }
+  
   Timer overall_processing_timer("overall processing");
-  update_representation_runtime_ = 0;
-  local_viewpoint_sampling_runtime_ = 0;
+  update_representation_runtime_ = 0; //用来存储总的 update representation 运行时间
+  local_viewpoint_sampling_runtime_ = 0; //局部视点采样时间，单位为s
   local_path_finding_runtime_ = 0;
   global_planning_runtime_ = 0;
   trajectory_optimization_runtime_ = 0;

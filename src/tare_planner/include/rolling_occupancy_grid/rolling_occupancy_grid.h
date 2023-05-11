@@ -37,6 +37,7 @@ public:
   explicit RollingOccupancyGrid(ros::NodeHandle& nh);
   ~RollingOccupancyGrid() = default;
 
+  //TODO:获取什么的分辨率？
   Eigen::Vector3d GetResolution()
   {
     return resolution_;

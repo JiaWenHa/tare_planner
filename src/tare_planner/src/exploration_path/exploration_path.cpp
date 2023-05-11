@@ -130,7 +130,8 @@ void ExplorationPath::FromPath(const nav_msgs::Path& path)
 }
 
 /**
- * 函数功能：将节点转为视点，视点的强度存储的是点的类型
+ * 函数功能：将所有节点转为可视点云，可视点云的强度信息存储的是节点的类型
+ * 可视点云保存在 vis_cloud 中
 */
 void ExplorationPath::GetVisualizationCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr vis_cloud) const
 {
@@ -147,7 +148,8 @@ void ExplorationPath::GetVisualizationCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr
 }
 
 /**
- * 函数功能：获取关键点的点
+ * 函数功能：将关键点转为可视点云，可视点云的强度信息存储的是节点的类型
+ * 可视点云保存在 vis_cloud 中
 */
 void ExplorationPath::GetKeyPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr vis_cloud) const
 {
@@ -173,6 +175,7 @@ void ExplorationPath::GetKeyPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr vis_
 
 /**
  * 函数功能：获取节点的位置
+ * 获取的节点的位置保存在 positions 中
 */
 void ExplorationPath::GetNodePositions(std::vector<Eigen::Vector3d>& positions) const
 {
@@ -184,7 +187,7 @@ void ExplorationPath::GetNodePositions(std::vector<Eigen::Vector3d>& positions) 
 }
 
 /**
- * 函数功能：清除所有路径点
+ * 函数功能：清空所有节点
 */
 void ExplorationPath::Reset()
 {

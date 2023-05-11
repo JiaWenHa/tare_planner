@@ -90,13 +90,16 @@ public:
   {
     parameters_.kUseFrontier = use_frontier;
   }
+
   void UpdateRobotPosition(geometry_msgs::Point robot_position)
   {
     // 更新机器人的位置并返回一个布尔标志，指示点云管理器的滚动窗口是否已经滚动
     bool pointcloud_manager_rolling = pointcloud_manager_->UpdateRobotPosition(robot_position);
     // 检索点云管理器的相邻单元格的原点，并将滚动占用网格的原点初始化为此值
+    // 机器人并不是大网格世界的中心点，距离机器人最近的网格的中心才是大网格世界的中心点
     Eigen::Vector3d pointcloud_manager_neighbor_cells_origin = pointcloud_manager_->GetNeighborCellsOrigin();
     rolling_occupancy_grid_->InitializeOrigin(pointcloud_manager_neighbor_cells_origin);
+
     // 更新机器人在占用网格中的位置并返回一个布尔标志，指示滚动占用网格是否已滚动
     bool occupancy_grid_rolling = rolling_occupancy_grid_->UpdateRobotPosition(
         Eigen::Vector3d(robot_position.x, robot_position.y, robot_position.z));
@@ -129,6 +132,7 @@ public:
     }
     robot_position_update_ = true;
   }
+
   template <class PCLPointType>
   void UpdateRegisteredCloud(typename pcl::PointCloud<PCLPointType>::Ptr& cloud)
   {

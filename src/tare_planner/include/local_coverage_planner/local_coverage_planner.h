@@ -37,10 +37,12 @@ public:
   ~LocalCoveragePlanner() = default;
 
   // Update representation
+  // 设置机器人的位置
   void SetRobotPosition(const Eigen::Vector3d& robot_position)
   {
     robot_position_ = robot_position;
   }
+  // 设置视点管理器
   void SetViewPointManager(std::shared_ptr<viewpoint_manager_ns::ViewPointManager> const& viewpoint_manager)
   {
     viewpoint_manager_ = viewpoint_manager;
@@ -48,35 +50,42 @@ public:
   }
 
   // Local coverage
+  // 设置前瞻点
   void SetLookAheadPoint(const Eigen::Vector3d& lookahead_point)
   {
     lookahead_point_ = lookahead_point;
     lookahead_point_update_ = true;
   }
+  //解决局部覆盖问题
   exploration_path_ns::ExplorationPath
   SolveLocalCoverageProblem(const exploration_path_ns::ExplorationPath& global_path, int uncovered_point_num,
                             int uncovered_frontier_point_num = 0);
 
   // Runtime
+  // 获取查找路径的时间
   int GetFindPathRuntime()
   {
     return find_path_runtime_;
   }
+  //获取视点采样的运行时间
   int GetViewPointSamplingRuntime()
   {
     return viewpoint_sampling_runtime_;
   }
+  //获取解TSP的运行时间
   int GetTSPRuntime()
   {
     return tsp_runtime_;
   }
 
+  // 获取局部覆盖完成标志
   bool IsLocalCoverageComplete()
   {
     return local_coverage_complete_;
   }
 
   // Visualization
+  //将视点变成可视化点云
   void GetSelectedViewPointVisCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud);
 
 private:
@@ -93,12 +102,14 @@ private:
                                   const std::vector<bool>& covered_point_list,
                                   const std::vector<bool>& covered_frontier_point_list,
                                   const std::vector<int>& selected_viewpoint_array_indices);
-
+  //选择视点
   void SelectViewPoint(const std::vector<std::pair<int, int>>& queue, const std::vector<bool>& covered,
                        std::vector<int>& selected_viewpoint_indices, bool use_frontier = false);
+  //从前沿点中选择视点
   void SelectViewPointFromFrontierQueue(std::vector<std::pair<int, int>>& frontier_queue,
                                         std::vector<bool>& frontier_covered,
                                         std::vector<int>& selected_viewpoint_indices);
+  //解TSP问题
   exploration_path_ns::ExplorationPath SolveTSP(const std::vector<int>& selected_viewpoint_indices,
                                                 std::vector<int>& ordered_viewpoint_indices);
 
@@ -125,10 +136,10 @@ private:
   int lookahead_viewpoint_ind_;
 
   // Runtime
-  int find_path_runtime_;
-  int viewpoint_sampling_runtime_;
-  int tsp_runtime_;
-  static const std::string kRuntimeUnit;
+  int find_path_runtime_; //查找路径的时间
+  int viewpoint_sampling_runtime_; //视点采样的时间
+  int tsp_runtime_; //解tsp问题的时间
+  static const std::string kRuntimeUnit; //运行时间单位
 
   std::vector<int> last_selected_viewpoint_indices_;
   std::vector<int> last_selected_viewpoint_array_indices_;

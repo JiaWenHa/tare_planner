@@ -27,7 +27,7 @@ namespace lidar_model_ns
 class LiDARModel
 {
 public:
-  static double pointcloud_resolution_;
+  static double pointcloud_resolution_; //点云分辨率
   explicit LiDARModel(double px = 0.0, double py = 0.0, double pz = 0.0, double rw = 1.0, double rx = 0.0,
                       double ry = 0.0, double rz = 0.0);
   explicit LiDARModel(const geometry_msgs::Pose& pose);
@@ -35,7 +35,7 @@ public:
 
   /**
    * @brief
-   * TODO
+   * 更新雷达覆盖
    * @tparam PointType
    * @param point
    */
@@ -147,22 +147,29 @@ public:
     pointcloud_resolution_ = cloud_dwz_resol * kCloudInflateRatio;
   }
 
+  //设置激光雷达的位姿
   void setPose(const geometry_msgs::Pose& pose)
   {
     pose_ = pose;
   }
+
+  //获取激光雷达的位姿
   geometry_msgs::Pose getPose()
   {
     return pose_;
   }
+
+  //设置激光雷达的位置
   void setPosition(const geometry_msgs::Point& position)
   {
     pose_.position = position;
   }
+  //获取激光雷达的位置
   geometry_msgs::Point getPosition() const
   {
     return pose_.position;
   }
+  //设置激光雷达的高度
   void SetHeight(double height)
   {
     pose_.position.z = height;
@@ -171,7 +178,7 @@ public:
 private:
   /**
    * @brief convert subscripts to linear indices
-   *
+   *        将下标转换为线性索引
    * @param row_index row index
    * @param column_index column index
    * @return int linear index
@@ -179,7 +186,7 @@ private:
   int sub2ind(int row_index, int column_index) const;
   /**
    * @brief convert linear indices to subscripts
-   *
+   *        将线性索引转换为下标
    * @param ind linear index
    * @param row_index row index
    * @param column_index column index
@@ -187,7 +194,7 @@ private:
   void ind2sub(int ind, int& row_index, int& column_index) const;
   /**
    * @brief whether a number is close to zero
-   *
+   *        一个数字是否接近于零
    * @param x input number
    * @return true
    * @return false
@@ -224,7 +231,7 @@ private:
   }
   /**
    * @brief Get the Horizontal Neighbor Num object
-   * TODO
+   *        获取水平邻居数对象
    * @param distance_to_point
    * @return int
    */
@@ -235,7 +242,7 @@ private:
   }
   /**
    * @brief Get the Vertical Neighbor Num object
-   * TODO
+   *        获取垂直邻居数对象
    * @param distance_to_point
    * @return int
    */
@@ -244,10 +251,12 @@ private:
     return static_cast<int>(ceil(pointcloud_resolution_ / distance_to_point * kToDegreeConst / kVerticalResolution)) /
            2;
   }
+  //行索引是否在范围内
   inline bool RowIndexInRange(int row_index) const
   {
     return row_index >= 0 && row_index < kVerticalVoxelSize;
   }
+  //列索引是否在范围内
   inline bool ColumnIndexInRange(int column_index) const
   {
     return column_index >= 0 && column_index < kHorizontalVoxelSize;
@@ -279,7 +288,7 @@ private:
   std::array<float, kHorizontalVoxelSize * kVerticalVoxelSize> covered_voxel_;
   // 体素是否重置
   std::array<bool, kHorizontalVoxelSize * kVerticalVoxelSize> reset_;
-  // 激光雷达模型的姿态
+  // 激光雷达的姿态
   geometry_msgs::Pose pose_;
 };
 }  // namespace lidar_model_ns

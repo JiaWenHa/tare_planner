@@ -533,6 +533,10 @@ int GridWorld::GetCellStatusCount(grid_world_ns::CellStatus status)
   return count;
 }
 
+/**
+ * Cell status的转换条件大概是如果能sample到至少一个viewpoint，这个cell就是exploring。
+ * 如果cell里面有viewpoint且它们都看不到足够的surface，这个cell就是会被加入almost covered的列队。
+*/
 void GridWorld::UpdateCellStatus(const std::shared_ptr<viewpoint_manager_ns::ViewPointManager>& viewpoint_manager)
 {
   int exploring_count = 0;
@@ -621,8 +625,7 @@ void GridWorld::UpdateCellStatus(const std::shared_ptr<viewpoint_manager_ns::Vie
       }
     }
 
-    // Cell status的转换条件大概是如果能sample到至少一个viewpoint，这个cell就是exploring。
-    // 如果cell里面有viewpoint且它们都看不到足够的surface，这个cell就是会被加入almost covered的列队。
+
     
     // Exploring to Covered
     if (subspaces_->GetCell(cell_ind).GetStatus() == CellStatus::EXPLORING &&

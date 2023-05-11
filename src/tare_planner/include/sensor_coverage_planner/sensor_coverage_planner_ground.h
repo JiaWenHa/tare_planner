@@ -111,9 +111,9 @@ struct PlannerData
   // PCL clouds TODO: keypose cloud does not need to be PlannerCloudPointType
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<PlannerCloudPointType>> keypose_cloud_;
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZ>> registered_scan_stack_;//用于存放一堆配准后的点云
-  std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> registered_cloud_;//用于存放配准的点云
+  std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> registered_cloud_;//用于存放配准后的点云
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> large_terrain_cloud_;
-  std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> terrain_collision_cloud_; // 用于存放小范围地形碰撞点云
+  std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> terrain_collision_cloud_; // 用于存放小范围地形碰撞点云，即障碍物点云。
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> terrain_ext_collision_cloud_; // 用于存放小大范围地形碰撞点云
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> viewpoint_vis_cloud_;
   std::unique_ptr<pointcloud_utils_ns::PCLCloud<pcl::PointXYZI>> grid_world_vis_cloud_;
@@ -167,7 +167,7 @@ public:
 
 private:
   bool keypose_cloud_update_;
-  bool initialized_;
+  bool initialized_; //系统是否初始化标志
   bool lookahead_point_update_;
   bool relocation_;
   bool start_exploration_;
@@ -184,13 +184,13 @@ private:
   PlannerData pd_;
   pointcloud_utils_ns::PointCloudDownsizer<pcl::PointXYZ> pointcloud_downsizer_; //降采样点云类实体
 
-  int update_representation_runtime_;
-  int local_viewpoint_sampling_runtime_;
-  int local_path_finding_runtime_;
-  int global_planning_runtime_;
-  int trajectory_optimization_runtime_;
-  int overall_runtime_;
-  int registered_cloud_count_;
+  int update_representation_runtime_; //用来存储总的 update representation 运行时间
+  int local_viewpoint_sampling_runtime_; //局部视点采样时间，单位为s
+  int local_path_finding_runtime_; //查找局部路径的时间，单位为s
+  int global_planning_runtime_; //全局路径规划时间，单位为ms
+  int trajectory_optimization_runtime_; //轨迹优化的运行时间，程序中未使用
+  int overall_runtime_; //单次探索的运行时间
+  int registered_cloud_count_;//对配准的点云进行计数
   int keypose_count_;
   int direction_change_count_;
   int direction_no_change_count_;
